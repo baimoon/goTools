@@ -66,5 +66,6 @@ func (this *RedisClient) Get(key string) (string, error) {
 		return "", err
 	}
 	value := string(reply.([]byte))
+	fmt.Println(conn.Close())
 	return value, nil
 }
