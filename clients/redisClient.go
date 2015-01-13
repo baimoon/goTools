@@ -16,7 +16,6 @@ func NewRedisClient() (client *RedisClient) {
 }
 
 func (client *RedisClient) Connect(conStr, pwd string) {
-	fmt.Println(conStr)
 	client.pool = client.newPool(conStr, pwd)
 }
 
