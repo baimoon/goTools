@@ -41,7 +41,7 @@ func (this *RedisClient) Set(key, value string) error {
 }
 
 //获取set的所有成员
-func (this *RedisClient) Smemebers(key string) ([]string, error) {
+func (this *RedisClient) Smembers(key string) ([]string, error) {
 	conn := this.pool.Get()
 	reply, err := conn.Do("SMEMBERS", key)
 	if err != nil {
