@@ -51,7 +51,7 @@ type redisClient struct {
 	pool *redis.Pool
 }
 
-func NewRedisClient(newFn func() (Conn, error), max int) *redisClient {
+func NewRedisClient(newFn func() (redis.Conn, error), max int) *redisClient {
 	client := &redisClient{}
 
 	client.pool = redis.NewPool(newFn, max)
