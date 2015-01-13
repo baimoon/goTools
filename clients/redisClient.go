@@ -109,6 +109,8 @@ func (this *RedisClient) Hgetall(key string) (map[string]string, error) {
 		}
 		result[f] = v
 	}
+	conn.Flush()
+	conn.Close()
 	return result, nil
 }
 
