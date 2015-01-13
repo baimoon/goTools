@@ -21,6 +21,7 @@ func (client *RedisClient) Connect(conStr, pwd string) {
 }
 
 func (client *RedisClient) newPool(server, password string) *redis.Pool {
+	fmt.Println("second ", server)
 	return &redis.Pool{
 		MaxIdle:     3,
 		IdleTimeout: 60 * time.Second,
