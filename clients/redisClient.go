@@ -1,10 +1,11 @@
 package clients
 
 import (
-	"fmt"
+	//"fmt"
 	"github.com/garyburd/redigo/redis"
 )
 
+/*
 type RedisClient struct {
 	conn redis.Conn
 }
@@ -43,4 +44,27 @@ func (this *RedisClient) Smembers(key string) ([]string, error) {
 		result = append(result, string(v.([]byte)))
 	}
 	return result, nil
+}
+*/
+
+type redisClient struct {
+	pool *redis.Pool
+}
+
+func NewRedisClient(newFn func() (Conn, error), max int) *redisClient {
+	client := &redisClient{}
+
+	client.pool = redis.NewPool(newFn, max)
+	return client
+}
+
+func (this *redisClient) Get(key string) (string, error) {
+	conn := this.pool.Get()
+	reply, err := conn.Do("get", key)
+	defer conn.Flush()
+	if err != nil || reply == nil {
+		return "", err
+	}
+	value := string(reply.([]byte))
+	return value, nil
 }

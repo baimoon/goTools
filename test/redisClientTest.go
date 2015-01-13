@@ -1,15 +1,21 @@
 package main
 
 import (
-    "goTools/clients"
-    "fmt"
+	"fmt"
+	"goTools/clients"
+	"time"
 )
+
 var (
-    REDIS_CONNECT_HOST_AND_PORT string = "127.0.0.1:6379"
+	REDIS_CONNECT_HOST_AND_PORT string = "127.0.0.1:6379"
 )
 
 func main() {
-    cli := clients.NewRedisClient()
-    cli.Connect(REDIS_CONNECT_HOST_AND_PORT, "")
-    fmt.Println(cli.Sadd("abc", "1"))
+
+	for {
+		client := clients.NewRedisClient("", "")
+		fmt.Println(client.Get("a"))
+		time.Sleep(50 * time.Nanosecond)
+	}
+
 }
