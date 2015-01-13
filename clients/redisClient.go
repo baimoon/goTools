@@ -21,11 +21,11 @@ func (client *RedisClient) Connect(conStr, pwd string) {
 }
 
 func (client *RedisClient) newPool(server, password string) *redis.Pool {
-	fmt.Println("second ", server)
 	return &redis.Pool{
 		MaxIdle:     3,
 		IdleTimeout: 60 * time.Second,
 		Dial: func() (redis.Conn, error) {
+			fmt.Println(server)
 			c, err := redis.Dial("tcp", server)
 			if err != nil {
 				return nil, err
