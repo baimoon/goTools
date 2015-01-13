@@ -47,18 +47,18 @@ func (this *RedisClient) Smembers(key string) ([]string, error) {
 }
 */
 
-type redisClient struct {
+type RedisClient struct {
 	pool *redis.Pool
 }
 
-func NewRedisClient(newFn func() (redis.Conn, error), max int) *redisClient {
-	client := &redisClient{}
+func NewRedisClient(newFn func() (redis.Conn, error), max int) *RedisClient {
+	client := &RedisClient{}
 
 	client.pool = redis.NewPool(newFn, max)
 	return client
 }
 
-func (this *redisClient) Get(key string) (string, error) {
+func (this *RedisClient) Get(key string) (string, error) {
 	conn := this.pool.Get()
 	reply, err := conn.Do("get", key)
 	defer conn.Flush()
