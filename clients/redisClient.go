@@ -1,6 +1,7 @@
 package clients
 
 import (
+	"fmt"
 	"github.com/garyburd/redigo/redis"
 )
 
@@ -15,7 +16,10 @@ func NewClient(host, port string) *RedisClient {
 }
 
 func (this *RedisClient) Close() {
-	this.conn.Close()
+	fmt.Println(this.conn)
+	if this.conn != nil {
+		this.conn.Close()
+	}
 }
 
 func (this *RedisClient) Get(key string) (string, error) {
