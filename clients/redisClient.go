@@ -1,7 +1,6 @@
 package clients
 
 import (
-	"fmt"
 	"github.com/garyburd/redigo/redis"
 )
 
@@ -37,7 +36,7 @@ func (this *RedisClient) Smembers(key string) ([]string, error) {
 	result := make([]string, 0)
 	res := reply.([]interface{})
 	for _, v := range res {
-		result.append(res, string(v.([]byte)))
+		result = append(result, string(v.([]byte)))
 	}
 	return result, nil
 }
