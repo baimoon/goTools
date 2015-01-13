@@ -1,7 +1,7 @@
 package clients
 
 import (
-	//"fmt"
+	"fmt"
 	"github.com/garyburd/redigo/redis"
 )
 
