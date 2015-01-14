@@ -145,11 +145,11 @@ func (this *RedisClient) Srem(key string, values ...string) (int64, error) {
 }
 
 //set中是否存在
-func (this *RedisClient) Ismembers(key string, field string) (bool, error) {
+func (this *RedisClient) Sismembers(key string, field string) (bool, error) {
 	conn := this.pool.Get()
 	defer conn.Close()
 
-	reply, err := conn.Do("SMEMBERS", key, field)
+	reply, err := conn.Do("SISMEMBER", key, field)
 	if err != nil {
 		return true, err
 	}
