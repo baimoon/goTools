@@ -47,6 +47,30 @@ func newPool(server, password string) *redis.Pool {
 	}
 }
 
+//---------------------------key类的操作-----------------------------
+//判断指定的key是否存在
+func (this *RedisClient) Exists(key string) (bool, error) {
+	conn := this.pool.Get()
+	defer conn.Close()
+	reply, err := conn.Do("EXISTS", key)
+	if err != nil {
+		return false, err
+	}
+	return reply.(int64) == 1, nil
+}
+
+//删除指定的key
+func (this *RedisClient) Del(key string) (bool, error) {
+	conn := this.pool.Get()
+	defer conn.Close()
+	reply, err := conn.Do("DEL", key)
+	if err != nil {
+		return false, err
+	}
+	return reply.(int64) == 1, nil
+}
+
+//---------------------------字符串类的操作---------------------------------
 //设置字符串类型的值
 func (this *RedisClient) Get(key string) (string, error) {
 	conn := this.pool.Get()
@@ -70,6 +94,7 @@ func (this *RedisClient) Set(key, value string) error {
 	return nil
 }
 
+//-------------------------SET类的操作--------------------------
 //获取set的所有成员
 func (this *RedisClient) Smembers(key string) ([]string, error) {
 	conn := this.pool.Get()
@@ -119,6 +144,19 @@ func (this *RedisClient) Srem(key string, values ...string) (int64, error) {
 	return count, nil
 }
 
+//set中是否存在
+func (this *RedisClient) Ismembers(key string, field string) (bool, error) {
+	conn := this.pool.Get()
+	defer conn.Close()
+
+	reply, err := conn.Do("SMEMBERS", key, field)
+	if err != nil {
+		return true, err
+	}
+	return reply.(int64) == 1, nil
+}
+
+//------------------------HASH类的操作-------------------------
 func (this *RedisClient) Hgetall(key string) (map[string]string, error) {
 	conn := this.pool.Get()
 	defer conn.Close()
@@ -138,6 +176,7 @@ func (this *RedisClient) Hgetall(key string) (map[string]string, error) {
 	return result, nil
 }
 
+//从hash中获取指定field的数据
 func (this *RedisClient) Hget(key string, field string) (string, error) {
 	conn := this.pool.Get()
 	defer conn.Close()
@@ -195,4 +234,35 @@ func (this *RedisClient) Hvals(key string) ([]string, error) {
 		}
 	}
 	return result, nil
+}
+
+func (this *RedisClient) _hset(conn redis.Conn, key string, field string, value string) (int64, error) {
+	reply, err := conn.Do("HSET", key, field, value)
+	if err != nil {
+		return 0, err
+	}
+	return reply.(int64), nil
+}
+
+//向hash中添加数据
+func (this *RedisClient) Hset(key string, field string, value string) (int64, error) {
+	conn := this.pool.Get()
+	defer conn.Close()
+	return this._hset(conn, key, field, value)
+}
+
+//向hash中添加指定的数据
+func (this *RedisClient) Hmset(key string, values map[string]string) (int64, error) {
+	conn := this.pool.Get()
+	defer conn.Close()
+
+	var count int64 = 0
+	for field, value := range values {
+		reply, err := this._hset(conn, key, field, value)
+		if err != nil {
+			continue
+		}
+		count = count + reply
+	}
+	return count, nil
 }
