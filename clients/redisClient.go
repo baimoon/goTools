@@ -165,7 +165,7 @@ func (this *RedisClient) Scard(key string) (int64, error) {
 	if err != nil {
 		return -1, err
 	}
-	return reply.(int64)
+	return reply.(int64), nil
 }
 
 //------------------------HASH类的操作-------------------------
