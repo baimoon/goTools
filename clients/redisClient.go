@@ -18,31 +18,30 @@ func NewRedisClient(newFn func() (redis.Conn, error), max int) *RedisClient {
 //设置字符串类型的值
 func (this *RedisClient) Get(key string) (string, error) {
 	conn := this.pool.Get()
+	defer conn.Close()
 	reply, err := conn.Do("get", key)
 	if err != nil || reply == nil {
 		return "", err
 	}
 	value := string(reply.([]byte))
-	conn.Flush()
-	conn.Close()
 	return value, nil
 }
 
 //获取字符串类型的值
 func (this *RedisClient) Set(key, value string) error {
 	conn := this.pool.Get()
+	defer conn.Close()
 	_, err := conn.Do("SET", key, value)
 	if err != nil {
 		return err
 	}
-	conn.Flush()
-	conn.Close()
 	return nil
 }
 
 //获取set的所有成员
 func (this *RedisClient) Smembers(key string) ([]string, error) {
 	conn := this.pool.Get()
+	defer conn.Close()
 	reply, err := conn.Do("SMEMBERS", key)
 	if err != nil {
 		return nil, err
@@ -55,14 +54,13 @@ func (this *RedisClient) Smembers(key string) ([]string, error) {
 			result = append(result, string(v.([]byte)))
 		}
 	}
-	conn.Flush()
-	conn.Close()
 	return result, nil
 }
 
 //向set中添加信息
 func (this *RedisClient) Sadd(key string, values ...string) (int64, error) {
 	conn := this.pool.Get()
+	defer conn.Close()
 	var count int64 = 0
 	for _, v := range values {
 		reply, err := conn.Do("SADD", key, v)
@@ -71,15 +69,13 @@ func (this *RedisClient) Sadd(key string, values ...string) (int64, error) {
 		}
 		count = count + reply.(int64)
 	}
-
-	conn.Flush()
-	conn.Close()
 	return count, nil
 }
 
 //从set中删除数据
 func (this *RedisClient) Srem(key string, values ...string) (int64, error) {
 	conn := this.pool.Get()
+	defer conn.Close()
 	var count int64 = 0
 	for _, v := range values {
 		reply, err := conn.Do("SREM", key, v)
@@ -88,14 +84,12 @@ func (this *RedisClient) Srem(key string, values ...string) (int64, error) {
 		}
 		count = count + reply.(int64)
 	}
-
-	conn.Flush()
-	conn.Close()
 	return count, nil
 }
 
 func (this *RedisClient) Hgetall(key string) (map[string]string, error) {
 	conn := this.pool.Get()
+	defer conn.Close()
 	reply, err := this._hkeys(conn, key)
 	if err != nil {
 		return nil, err
@@ -109,16 +103,13 @@ func (this *RedisClient) Hgetall(key string) (map[string]string, error) {
 		}
 		result[f] = v
 	}
-	conn.Flush()
-	conn.Close()
 	return result, nil
 }
 
 func (this *RedisClient) Hget(key string, field string) (string, error) {
 	conn := this.pool.Get()
+	defer conn.Close()
 	reply, err := this._hget(conn, key, field)
-	conn.Flush()
-	conn.Close()
 	return reply, err
 }
 
@@ -133,12 +124,11 @@ func (this *RedisClient) _hget(conn redis.Conn, key string, field string) (strin
 //获取hash的keys
 func (this *RedisClient) Hkeys(key string) ([]string, error) {
 	conn := this.pool.Get()
+	defer conn.Close()
 	reply, err := this._hkeys(conn, key)
 	if err != nil {
 		return nil, err
 	}
-	conn.Flush()
-	conn.Close()
 	return reply, nil
 }
 
@@ -160,6 +150,7 @@ func (this *RedisClient) _hkeys(conn redis.Conn, key string) ([]string, error) {
 //获取hash的values
 func (this *RedisClient) Hvals(key string) ([]string, error) {
 	conn := this.pool.Get()
+	defer conn.Close()
 	reply, err := conn.Do("HVALS", key)
 	if err != nil {
 		return nil, err
@@ -171,7 +162,5 @@ func (this *RedisClient) Hvals(key string) ([]string, error) {
 			result = append(result, string(v.([]byte)))
 		}
 	}
-	conn.Flush()
-	conn.Close()
 	return result, nil
 }
