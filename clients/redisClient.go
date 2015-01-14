@@ -156,6 +156,18 @@ func (this *RedisClient) Sismembers(key string, field string) (bool, error) {
 	return reply.(int64) == 1, nil
 }
 
+//set中元素的个数
+func (this *RedisClient) Scard(key string) (int64, error) {
+	conn := this.pool.Get()
+	defer conn.Close()
+
+	reply, err := conn.Do("SCARD", key)
+	if err != nil {
+		return -1, err
+	}
+	return reply.(int64)
+}
+
 //------------------------HASH类的操作-------------------------
 func (this *RedisClient) Hgetall(key string) (map[string]string, error) {
 	conn := this.pool.Get()
