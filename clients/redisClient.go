@@ -2,6 +2,7 @@ package clients
 
 import (
 	"github.com/garyburd/redigo/redis"
+	"time"
 )
 
 type RedisClient struct {
@@ -13,6 +14,35 @@ func NewRedisClient(newFn func() (redis.Conn, error), max int) *RedisClient {
 
 	client.pool = redis.NewPool(newFn, max)
 	return client
+}
+
+func NewRedisClientForWeb(server, password string) *RedisClient {
+	client := new(RedisClient)
+	client.pool = newPool(server, password)
+	return client
+}
+
+//采用作者建议的web application的创建线程池的方法
+func newPool(server, password string) *redis.Pool {
+	return &redis.Pool{
+		MaxIdle:     5,
+		IdleTimeout: 240 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			c, err := redis.Dial("tcp", server)
+			if err != nil {
+				return nil, err
+			}
+			if _, err := c.Do("AUTH", password); err != nil {
+				c.Close()
+				return nil, err
+			}
+			return c, err
+		},
+		TestOnBorrow: func(c redis.Conn, t time.Time) error {
+			_, err := c.Do("PING")
+			return err
+		},
+	}
 }
 
 //设置字符串类型的值
