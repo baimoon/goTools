@@ -15,7 +15,7 @@ func main() {
 	for {
 		client := clients.NewRedisClientForWeb(REDIS_CONNECT_HOST_AND_PORT, "")
 
-		fmt.Println(client.Zscore("abc", "momoid"))
+		fmt.Println(client.Zscore("abc", "aac"))
 		time.Sleep(time.Second)
 	}
 
