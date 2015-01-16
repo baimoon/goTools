@@ -1,7 +1,9 @@
 package clients
 
 import (
+	"errors"
 	"github.com/garyburd/redigo/redis"
+	"strconv"
 	"time"
 )
 
@@ -289,5 +291,19 @@ func (this *RedisClient) Zscore(key string, member string) (float64, error) {
 	if err != nil {
 		return -1, err
 	}
-	return reply.(float64), nil
+
+	scores := reply.([]uint8)
+	var score float64
+
+	if len(scores) > 0 {
+		scoreStr := string(scores)
+		score, err = strconv.ParseFloat(scoreStr, 64)
+		if err != nil {
+			return -1, nil
+		}
+	} else {
+		return -1, errors.New("没有对应的数据")
+	}
+
+	return float64(score), nil
 }
