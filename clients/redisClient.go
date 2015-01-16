@@ -294,8 +294,8 @@ func (this *RedisClient) Zscore(key string, member string) (float64, error) {
 		return -1, errors.New("没有对应的数据")
 	}
 
-	scores := reply.([]uint8)
 	var score float64
+	scores := reply.([]uint8)
 
 	if len(scores) > 0 {
 		scoreStr := string(scores)
