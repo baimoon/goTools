@@ -278,3 +278,16 @@ func (this *RedisClient) Hmset(key string, values map[string]string) (int64, err
 	}
 	return count, nil
 }
+
+//---------------------zset---------------------
+//获取zset中的分数
+func (this *RedisClient) Zscore(key string, member string) (float64, error) {
+	conn := this.pool.Get()
+	defer conn.Close()
+
+	reply, err := conn.Do("ZSCORE", key, member)
+	if err != nil {
+		return -1, err
+	}
+	return reply.(float64), nil
+}
